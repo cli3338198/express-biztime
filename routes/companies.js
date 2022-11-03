@@ -1,3 +1,5 @@
+"use strict";
+
 const { Router } = require("express");
 
 const db = require("../db");
@@ -27,12 +29,12 @@ router.get("/", async function (req, res) {
  * If the company given cannot be found, this should return a 404 status response.
  */
 router.get("/:code", async function (req, res) {
-  const { code } = req.params;
+  const code = req.params.code;
 
   const results = await db.query(
     `SELECT code, name, description
       FROM companies
-      WHERE code === $1`,
+      WHERE code = $1`,
     [code]
   );
 
@@ -56,6 +58,16 @@ router.post("/", async function (req, res) {
 
   const { code, name, description } = req.body;
 
+  if (!code) {
+    throw new BadRequestError(`missing code`);
+  }
+  if (!name) {
+    throw new BadRequestError(`missing name`);
+  }
+  if (!description) {
+    throw new BadRequestError(`missing description`);
+  }
+
   const results = await db.query(
     `INSERT INTO companies (code, name, description)
         VALUES ($1, $2, $3)
@@ -71,7 +83,7 @@ router.post("/", async function (req, res) {
 /**
  * PUT /companies/[code]
  * Edits existing company
- * Takes in JSON like {name, description}
+ * Takes in JSON like {name, description}, both required
  * Returns obj of updated company JSON like {company: {code, name, description}}
  * Should return 404 if company cannot be found
  */
@@ -80,6 +92,13 @@ router.put("/:code", async function (req, res) {
   if (req.body === undefined) throw new BadRequestError();
 
   const { name, description } = req.body;
+
+  if (!name) {
+    throw new BadRequestError(`missing name`);
+  }
+  if (!description) {
+    throw new BadRequestError(`missing description`);
+  }
 
   const results = await db.query(
     `UPDATE companies
@@ -103,9 +122,12 @@ router.put("/:code", async function (req, res) {
  */
 router.delete("/:code", async function (req, res) {
   const { code } = req.params;
-  const results = await db.query("DELETE FROM companies WHERE code = $1", [
-    code,
-  ]);
+
+  const results = await db.query(
+    `DELETE FROM companies WHERE code = $1
+    RETURNING code`,
+    [code]
+  );
 
   const company = results.rows[0];
 
