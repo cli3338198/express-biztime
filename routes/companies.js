@@ -20,6 +20,7 @@ router.get("/", async function (req, res) {
   );
 
   const companies = results.rows;
+
   return res.json({ companies });
 });
 
@@ -42,6 +43,15 @@ router.get("/:code", async function (req, res) {
   const company = results.rows[0];
 
   if (!company) throw new NotFoundError();
+
+  const invoiceResults = await db.query(
+    `SELECT id
+    FROM invoices 
+    WHERE comp_code = $1`,
+    [code]
+  );
+
+  company.invoices = invoiceResults.rows.map((invoice) => invoice.id);
 
   return res.json({ company });
 });
