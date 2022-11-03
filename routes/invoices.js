@@ -94,8 +94,17 @@ router.post("/", async function (req, res) {
   }
 
   // just search for the company?
+  const foundCompanyResults = await db.query(
+    `SELECT code
+      FROM companies
+      WHERE code = $1`,
+    [comp_code]
+  );
 
-  // try {
+  const foundCompany = foundCompanyResults.rows[0];
+
+  if(!foundCompany) throw new BadRequestError("company does not exist");
+
   const result = await db.query(
     `INSERT INTO invoices (comp_code, amt)
       VALUES ($1, $2)
@@ -105,10 +114,6 @@ router.post("/", async function (req, res) {
 
   const invoice = result.rows[0];
   return res.json({ invoice });
-  // } catch (err) {
-  //   // TODO: check err or integrity issue
-  //   throw new BadRequestError();
-  // }
 });
 
 /**
