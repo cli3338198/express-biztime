@@ -5,6 +5,7 @@ const { Router } = require("express");
 const db = require("../db");
 
 const { NotFoundError, BadRequestError } = require("../expressError");
+const { getCompanyHandler } = require("../handlers/handlers");
 
 const router = Router();
 
@@ -46,7 +47,7 @@ router.get("/:code", async function (req, res) {
 
   const invoiceResults = await db.query(
     `SELECT id
-    FROM invoices
+    FROM invoices 
     WHERE comp_code = $1`,
     [code]
   );

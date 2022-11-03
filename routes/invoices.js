@@ -8,7 +8,8 @@ const { NotFoundError, BadRequestError } = require("../expressError");
 
 const router = Router();
 
-const app = require("../app")
+const app = require("../app");
+const { getCompanyHandler } = require("../handlers/handlers");
 
 /**
  * GET /invoices
@@ -92,18 +93,18 @@ router.post("/", async function (req, res) {
     throw new BadRequestError("amt required");
   }
 
-  await app.get(`/companies/${comp_code}`);
+  // just search for the company?
 
   // try {
-    const result = await db.query(
-      `INSERT INTO invoices (comp_code, amt)
+  const result = await db.query(
+    `INSERT INTO invoices (comp_code, amt)
       VALUES ($1, $2)
       RETURNING id, comp_code, amt, paid, add_date, paid_date`,
-      [comp_code, amt]
-    );
+    [comp_code, amt]
+  );
 
-    const invoice = result.rows[0];
-    return res.json({ invoice });
+  const invoice = result.rows[0];
+  return res.json({ invoice });
   // } catch (err) {
   //   // TODO: check err or integrity issue
   //   throw new BadRequestError();
