@@ -46,7 +46,7 @@ router.get("/:code", async function (req, res) {
 
   const invoiceResults = await db.query(
     `SELECT id
-    FROM invoices 
+    FROM invoices
     WHERE comp_code = $1`,
     [code]
   );

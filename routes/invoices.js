@@ -8,6 +8,8 @@ const { NotFoundError, BadRequestError } = require("../expressError");
 
 const router = Router();
 
+const app = require("../app")
+
 /**
  * GET /invoices
  * Return info on invoices: like {invoices: [{id, comp_code}, ...]}
@@ -90,7 +92,9 @@ router.post("/", async function (req, res) {
     throw new BadRequestError("amt required");
   }
 
-  try {
+  await app.get(`/companies/${comp_code}`);
+
+  // try {
     const result = await db.query(
       `INSERT INTO invoices (comp_code, amt)
       VALUES ($1, $2)
@@ -100,10 +104,10 @@ router.post("/", async function (req, res) {
 
     const invoice = result.rows[0];
     return res.json({ invoice });
-  } catch (err) {
-    // TODO: check err or integrity issue
-    throw new BadRequestError();
-  }
+  // } catch (err) {
+  //   // TODO: check err or integrity issue
+  //   throw new BadRequestError();
+  // }
 });
 
 /**
