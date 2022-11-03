@@ -51,10 +51,10 @@ router.get("/:code", async function (req, res) {
  */
 
 router.post("/", async function (req, res) {
-  if(req.body === undefined) throw new BadRequestError();
+  if (req.body === undefined) throw new BadRequestError();
   // What happens if input is optional?
 
-  const {code, name, description} = req.body;
+  const { code, name, description } = req.body;
 
   const results = await db.query(
     `INSERT INTO companies (code, name, description)
@@ -77,9 +77,9 @@ router.post("/", async function (req, res) {
  */
 
 router.put("/:code", async function (req, res) {
-  if(req.body === undefined) throw new BadRequestError();
+  if (req.body === undefined) throw new BadRequestError();
 
-  const {name, description} = req.body;
+  const { name, description } = req.body;
 
   const results = await db.query(
     `UPDATE companies
@@ -87,12 +87,31 @@ router.put("/:code", async function (req, res) {
             description=$2
         WHERE code = $3
         RETURNING code, name, description`,
-    [name, description, req.params.code],
+    [name, description, req.params.code]
   );
 
   const company = results.rows[0];
 
-  return res.json({ company })
+  return res.json({ company });
+});
+
+/**
+ * DELETE /companies/[code]
+ * Accepts company code in query params
+ * Deletes company.
+ * Should return 404 if company cannot be found.
+ */
+router.delete("/:code", async function (req, res) {
+  const { code } = req.params;
+  const results = await db.query("DELETE FROM companies WHERE code = $1", [
+    code,
+  ]);
+
+  const company = results.rows[0];
+
+  if (!company) throw new NotFoundError();
+
+  return res.json({ status: "Deleted" });
 });
 
 module.exports = router;
