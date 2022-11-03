@@ -13,10 +13,10 @@ const router = Router();
  * returns a list of companies in following format, {companies: [{code, name}, ...]}
  */
 router.get("/", async function (req, res) {
-  // TODO: order the list
   const results = await db.query(
     `SELECT code, name
-      FROM companies`
+      FROM companies
+      ORDER BY code`
   );
 
   const companies = results.rows;
