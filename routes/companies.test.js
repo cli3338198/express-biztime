@@ -78,3 +78,39 @@ describe("POST /companies", function () {
     expect(resp.statusCode).toEqual(400);
   });
 });
+
+describe("PUT /companies/[code]", function () {
+  test("Entirely update a single company", async function () {
+    const resp = await request(app)
+      .put(`/companies/mac`)
+      .send({
+        name: "windows",
+        description: "Bought out!!!",
+      });
+    expect(resp.statusCode).toEqual(200);
+    expect(resp.body).toEqual({
+      company: {
+        code: "mac",
+        name: "windows",
+        description: "Bought out!!!"
+      }
+    });
+  });
+
+  test("Respond with 404 if not found", async function () {
+    const resp = await request(app)
+      .patch(`/companies/cat`)
+      .send({
+        name: "windows",
+        description: "Bought out!!!",
+      });
+    expect(resp.statusCode).toEqual(404);
+  })
+
+  test("Respond with 400 if empty request body", async function () {
+    const resp = await request(app)
+      .patch(`/companies/mac`)
+      .send();
+    expect(resp.statusCode).toEqual(400);
+  })
+});
