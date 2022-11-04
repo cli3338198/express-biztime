@@ -49,3 +49,32 @@ describe("GET /companies/[code]", function () {
     expect(resp.statusCode).toEqual(404);
   });
 });
+
+describe("POST /companies", function() {
+  test("Create new company", async function() {
+    const resp = await request(app)
+      .post(`/companies`)
+      .send({
+        code: "len",
+        name: "LENOVO",
+        description: "lenovo company",
+      })
+    expect(resp.statusCode).toEqual(201);
+    expect(resp.body).toEqual({
+      company: {
+        code: "len",
+        name: "LENOVO",
+        description: "lenovo company",
+      }
+    });
+    const results = db.query(`SELECT * FROM companies`);
+    expect(results.rows.length).toEqual(2);
+  });
+
+  test("Respond with 400 if empty request body", async function() {
+    const resp = await request(app)
+      .post(`/companies`)
+      .send();
+    expect(resp.statusCode).toEqual(400);
+  })
+});
