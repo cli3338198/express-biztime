@@ -23,7 +23,7 @@ beforeEach(async function () {
 afterEach(async function () {});
 
 describe("GET /companies", function () {
-  test("Gets a list of 2 companies", async function () {
+  test("Gets a list of 1 company", async function () {
     const resp = await request(app).get(`/companies`);
     expect(resp.body).toEqual({
       companies: [{ code: "mac", name: "APPLE" }],
@@ -81,36 +81,49 @@ describe("POST /companies", function () {
 
 describe("PUT /companies/[code]", function () {
   test("Entirely update a single company", async function () {
-    const resp = await request(app)
-      .put(`/companies/mac`)
-      .send({
-        name: "windows",
-        description: "Bought out!!!",
-      });
+    const resp = await request(app).put(`/companies/mac`).send({
+      name: "windows",
+      description: "Bought out!!!",
+    });
     expect(resp.statusCode).toEqual(200);
     expect(resp.body).toEqual({
       company: {
         code: "mac",
         name: "windows",
-        description: "Bought out!!!"
-      }
+        description: "Bought out!!!",
+      },
     });
   });
 
   test("Respond with 404 if not found", async function () {
-    const resp = await request(app)
-      .patch(`/companies/cat`)
-      .send({
-        name: "windows",
-        description: "Bought out!!!",
-      });
+    const resp = await request(app).patch(`/companies/cat`).send({
+      name: "windows",
+      description: "Bought out!!!",
+    });
     expect(resp.statusCode).toEqual(404);
-  })
+  });
 
   test("Respond with 400 if empty request body", async function () {
-    const resp = await request(app)
-      .patch(`/companies/mac`)
-      .send();
+    const resp = await request(app).put(`/companies/mac`).send();
     expect(resp.statusCode).toEqual(400);
-  })
+  });
+});
+
+describe("DELETE /companies/[code]", function () {
+  test("It should delete a company", async function () {
+    let results = await db.query(`SELECT * FROM companies`);
+    expect(results.rows.length).toEqual(1);
+    const resp = await request(app).delete(`/companies/mac`);
+
+    expect(resp.statusCode).toEqual(200);
+    expect(resp.body).toEqual({ status: "Deleted" });
+
+    results = await db.query(`SELECT * FROM companies`);
+    expect(results.rows.length).toEqual(0);
+  });
+
+  test("It should fail if not a valid company code", async function () {
+    const resp = await request(app).delete(`/companies/MAC`);
+    expect(resp.statusCode).toEqual(404);
+  });
 });
