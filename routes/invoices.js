@@ -8,9 +8,6 @@ const { NotFoundError, BadRequestError } = require("../expressError");
 
 const router = Router();
 
-const app = require("../app");
-const { getCompanyHandler } = require("../handlers/handlers");
-
 /**
  * GET /invoices
  * Return info on invoices: like {invoices: [{id, comp_code}, ...]}
@@ -103,7 +100,7 @@ router.post("/", async function (req, res) {
 
   const foundCompany = foundCompanyResults.rows[0];
 
-  if(!foundCompany) throw new BadRequestError("company does not exist");
+  if (!foundCompany) throw new BadRequestError("company does not exist");
 
   const result = await db.query(
     `INSERT INTO invoices (comp_code, amt)

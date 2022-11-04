@@ -20,6 +20,7 @@
   "homepage": "https://github.com/cli3338198/express-biztime#readme",
   "dependencies": {
     "express": "^5.0.0-beta.1",
-    "pg": "^8.8.0"
+    "pg": "^8.8.0",
+    "supertest": "^6.3.1"
   }
 }

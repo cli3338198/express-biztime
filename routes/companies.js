@@ -5,7 +5,6 @@ const { Router } = require("express");
 const db = require("../db");
 
 const { NotFoundError, BadRequestError } = require("../expressError");
-const { getCompanyHandler } = require("../handlers/handlers");
 
 const router = Router();
 
@@ -28,7 +27,7 @@ router.get("/", async function (req, res) {
 /**
  * GET /companies/[code]
  * Takes in a code in the query param
- * Return obj of company: {company: {code, name, description}}
+ * Return obj of company: {company: {code, name, description, invoices}}
  * If the company given cannot be found, this should return a 404 status response.
  */
 router.get("/:code", async function (req, res) {
